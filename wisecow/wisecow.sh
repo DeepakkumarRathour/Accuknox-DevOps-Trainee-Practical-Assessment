@@ -25,13 +25,17 @@ EOF
 }
 
 prerequisites() {
-    command -v cowsay >/dev/null 2>&1 &&
-    command -v fortune >/dev/null 2>&1 ||
-    { 
-        echo "Install prerequisites."
+    if [ ! -x /usr/games/cowsay ]; then
+        echo "cowsay missing"
         exit 1
-    }
+    fi
+
+    if [ ! -x /usr/games/fortune ]; then
+        echo "fortune missing"
+        exit 1
+    fi
 }
+
 
 main() {
     prerequisites
