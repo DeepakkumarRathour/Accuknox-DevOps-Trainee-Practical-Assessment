@@ -1,20 +1,46 @@
-FROM debian:12-slim
-WORKDIR /app
+#!/usr/bin/env bash
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    fortune-mod \
-    cowsay \
-    netcat-openbsd \
-    bash \
-    && rm -rf /var/lib/apt/lists/*
+SRVPORT=4499
+RSPFILE=response
 
-# Copy script
-COPY wisecow.sh /app/wisecow.sh
+rm -f $RSPFILE
+mkfifo $RSPFILE
 
-# Convert CRLF to LF inside container just to be safe
-RUN sed -i 's/\r$//' /app/wisecow.sh && chmod +x /app/wisecow.sh
+get_api() {
+    read line
+    echo $line
+}
 
-EXPOSE 4499
+handleRequest() {
+    # 1) Process the request
+    get_api
+    mod=$(fortune)
 
-CMD ["bash", "/app/wisecow.sh"]
+cat <<EOF > $RSPFILE
+HTTP/1.1 200
+
+
+<pre>$(cowsay "$mod")</pre>
+EOF
+}
+
+prerequisites() {
+    command -v cowsay >/dev/null 2>&1 &&
+    command -v fortune >/dev/null 2>&1 ||
+    { 
+        echo "Install prerequisites."
+        exit 1
+    }
+}
+
+main() {
+    prerequisites
+    echo "Wisdom served on port=$SRVPORT..."
+
+    while true; do
+        cat $RSPFILE | nc -lN $SRVPORT | handleRequest
+        sleep 0.01
+    done
+}
+
+main
