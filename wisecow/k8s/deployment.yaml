@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
       - name: wisecow
-        image: ghcr.io/DeepakkumarRathour/wisecow:latest
+        image: ghcr.io/deepakkumarrathour/wisecow:latest
         ports:
         - containerPort: 4499
