@@ -1,9 +1,11 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
+ENV DEBIAN_FRONTEND=noninteractive
+
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
-    fortune-mod \
     cowsay \
+    fortune-mod \
     netcat-openbsd \
     bash \
     && rm -rf /var/lib/apt/lists/*
